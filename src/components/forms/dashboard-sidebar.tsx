@@ -548,12 +548,12 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
         <Divider my="md" />
 
         <AppShell.Section>
-          <Group wrap="nowrap" gap="xs">
-            <Avatar src={userImage} radius="xl" size="sm">
+          <Group wrap="nowrap" gap="xs" style={{ overflow: 'visible' }}>
+            <Avatar src={userImage} radius="xl" size="sm" style={{ flexShrink: 0 }}>
               {!userImage && userName.charAt(0).toUpperCase()}
             </Avatar>
             {!collapsed && (
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                 <Text
                   size="sm"
                   fw={500}
@@ -572,6 +572,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                 variant="subtle"
                 color="red"
                 onClick={() => setShowLogoutModal(true)}
+                style={{ flexShrink: 0 }}
               >
                 <IconLogout size="1rem" />
               </ActionIcon>
