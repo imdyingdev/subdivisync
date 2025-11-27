@@ -393,7 +393,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           height: "100dvh",
           display: "flex",
           flexDirection: "column",
-          position: "relative",
+          overflow: "hidden",
         }}
       >
         <AppShell.Section>
@@ -448,9 +448,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Group>
         </AppShell.Section>
 
-        <Divider mb="xs" />
+        <Divider mb="md" />
 
-        <AppShell.Section grow component={ScrollArea} type="auto" scrollbarSize={6} style={{ minHeight: 0, flex: 1 }}>
+        <AppShell.Section grow component={ScrollArea} type="auto" scrollbarSize={6}>
           <Stack gap="xs">
             {navItems.map((item) => (
               <Tooltip
@@ -545,15 +545,15 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Stack>
         </AppShell.Section>
 
-        <Divider my="xs" />
+        <Divider my="md" />
 
-        <AppShell.Section style={{ flexShrink: 0, paddingBottom: '8px' }}>
-          <Group wrap="nowrap" gap="xs" style={{ overflow: 'visible' }}>
-            <Avatar src={userImage} radius="xl" size="sm" style={{ flexShrink: 0 }}>
+        <AppShell.Section>
+          <Group wrap="nowrap" gap="xs">
+            <Avatar src={userImage} radius="xl" size="sm">
               {!userImage && userName.charAt(0).toUpperCase()}
             </Avatar>
             {!collapsed && (
-              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <Text
                   size="sm"
                   fw={500}
@@ -572,7 +572,6 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                 variant="subtle"
                 color="red"
                 onClick={() => setShowLogoutModal(true)}
-                style={{ flexShrink: 0 }}
               >
                 <IconLogout size="1rem" />
               </ActionIcon>
