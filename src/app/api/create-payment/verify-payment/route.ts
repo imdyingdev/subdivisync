@@ -96,20 +96,21 @@ async function sendReceiptEmail(params: {
           
           <!-- Receipt Details -->
           <div style="background-color: #f9fafb; margin: 0 20px; padding: 20px; border-radius: 8px;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Receipt ID:</td>
-                <td style="padding: 10px 0; color: #111827; font-size: 14px; text-align: right; font-family: monospace;">${receiptId}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px 0; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb;">Payment Date:</td>
-                <td style="padding: 10px 0; color: #111827; font-size: 14px; text-align: right; border-top: 1px solid #e5e7eb;">${formatDate(paidDate)}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px 0; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb;">Description:</td>
-                <td style="padding: 10px 0; color: #111827; font-size: 14px; text-align: right; border-top: 1px solid #e5e7eb;">${description}</td>
-              </tr>
-            </table>
+            <!-- Receipt ID -->
+            <div style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 12px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Receipt ID</p>
+              <p style="color: #111827; font-size: 14px; margin: 0; font-family: monospace; word-break: break-all;">${receiptId}</p>
+            </div>
+            <!-- Payment Date -->
+            <div style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 12px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Payment Date</p>
+              <p style="color: #111827; font-size: 14px; margin: 0;">${formatDate(paidDate)}</p>
+            </div>
+            <!-- Description -->
+            <div style="padding: 12px 0;">
+              <p style="color: #6b7280; font-size: 12px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Description</p>
+              <p style="color: #111827; font-size: 14px; margin: 0; word-break: break-word;">${description}</p>
+            </div>
           </div>
           
           <!-- View Receipt Button -->
