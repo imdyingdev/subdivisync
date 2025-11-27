@@ -386,7 +386,19 @@ const PropertyListingPage = () => {
               padding="lg"
               radius="lg"
               withBorder
-              style={{ boxShadow: getDefaultShadow() }}
+              style={{ 
+                boxShadow: getDefaultShadow(),
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = `0 8px 25px ${rgba(theme.black, 0.15)}`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = getDefaultShadow();
+              }}
             >
               <AspectRatio ratio={16 / 9}>
                 {property.images && property.images.length > 0 ? (
@@ -417,8 +429,8 @@ const PropertyListingPage = () => {
                 </Group>
 
                 <Group gap="xs">
-                  <IconMapPin size={16} color="gray" />
-                  <Text size="sm" c="dimmed">
+                  <IconMapPin size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                  <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                     {property.location}
                   </Text>
                 </Group>
@@ -429,23 +441,23 @@ const PropertyListingPage = () => {
 
                 <SimpleGrid cols={2}>
                   <Group gap="xs">
-                    <IconBuilding size={16} color="gray" />
-                    <Text size="sm" c="dimmed">
+                    <IconBuilding size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                    <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                       {property.type
                         .replace("-", " ")
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </Text>
                   </Group>
                   <Group gap="xs">
-                    <IconSquare size={16} color="gray" />
-                    <Text size="sm" c="dimmed">
+                    <IconSquare size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                    <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                       {property.size}
                     </Text>
                   </Group>
                   {(property.bedrooms ?? 0) > 0 && (
                     <Group gap="xs">
-                      <IconBed size={16} color="gray" />
-                      <Text size="sm" c="dimmed">
+                      <IconBed size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                         {property.bedrooms} Bedroom
                         {property.bedrooms !== 1 ? "s" : ""}
                       </Text>
@@ -453,8 +465,8 @@ const PropertyListingPage = () => {
                   )}
                   {(property.bathrooms ?? 0) > 0 && (
                     <Group gap="xs">
-                      <IconBath size={16} color="gray" />
-                      <Text size="sm" c="dimmed">
+                      <IconBath size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                         {property.bathrooms} Bathroom
                         {property.bathrooms !== 1 ? "s" : ""}
                       </Text>
@@ -462,8 +474,8 @@ const PropertyListingPage = () => {
                   )}
                   {(property.sqft ?? 0) > 0 && (
                     <Group gap="xs">
-                      <IconSquare size={16} color="gray" />
-                      <Text size="sm" c="dimmed">
+                      <IconSquare size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                         {property.sqft} sq ft
                       </Text>
                     </Group>
@@ -471,7 +483,7 @@ const PropertyListingPage = () => {
                 </SimpleGrid>
 
                 {property.description && (
-                  <Text size="sm" c="dimmed" lineClamp={2}>
+                  <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"} lineClamp={2}>
                     {property.description}
                   </Text>
                 )}
