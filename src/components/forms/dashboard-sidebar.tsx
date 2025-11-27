@@ -388,7 +388,11 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
         p={collapsed ? "xs" : "md"}
         bg={colorScheme === "dark" ? "dark.8" : "white"}
         withBorder
-        style={{ height: "100vh" }}
+        style={{ 
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
         <AppShell.Section>
           <Group justify="space-between" mb="md">
@@ -539,31 +543,14 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Stack>
         </AppShell.Section>
 
-        <Divider my="md" />
+        <Divider my="md" style={{ marginTop: 'auto' }} />
 
         <AppShell.Section>
-          {collapsed ? (
-            <Stack gap="xs" align="center">
-              <Tooltip label={`${userName} - ${userTitle}`} position="right">
-                <Avatar src={userImage} radius="xl" size="sm">
-                  {!userImage && userName.charAt(0).toUpperCase()}
-                </Avatar>
-              </Tooltip>
-              <Tooltip label="Logout" position="right">
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  onClick={() => setShowLogoutModal(true)}
-                >
-                  <IconLogout size="1rem" />
-                </ActionIcon>
-              </Tooltip>
-            </Stack>
-          ) : (
-            <Group wrap="nowrap" gap="xs">
-              <Avatar src={userImage} radius="xl" size="sm">
-                {!userImage && userName.charAt(0).toUpperCase()}
-              </Avatar>
+          <Group wrap="nowrap" gap="xs">
+            <Avatar src={userImage} radius="xl" size="sm">
+              {!userImage && userName.charAt(0).toUpperCase()}
+            </Avatar>
+            {!collapsed && (
               <div style={{ flex: 1, minWidth: 0 }}>
                 <Text
                   size="sm"
@@ -577,17 +564,17 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                   {userEmail || userTitle}
                 </Text>
               </div>
-              <Tooltip label="Logout">
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  onClick={() => setShowLogoutModal(true)}
-                >
-                  <IconLogout size="1rem" />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-          )}
+            )}
+            <Tooltip label="Logout" position="right">
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                onClick={() => setShowLogoutModal(true)}
+              >
+                <IconLogout size="1rem" />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
         </AppShell.Section>
       </AppShell.Navbar>
 

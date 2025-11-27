@@ -79,7 +79,7 @@ function UnlockRequestContent() {
   }, [emailFromUrl, tokenFromUrl]);
 
   const wordCount = reason.trim().split(/\s+/).filter(Boolean).length;
-  const isReasonValid = wordCount >= 20;
+  const isReasonValid = wordCount >= 5;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +91,7 @@ function UnlockRequestContent() {
     }
 
     if (!isReasonValid) {
-      setError("Please provide a reason with at least 20 words");
+      setError("Please provide a reason with at least 5 words");
       return;
     }
 
@@ -365,7 +365,7 @@ function UnlockRequestContent() {
               c={isReasonValid ? "green" : "dimmed"}
               mt={4}
             >
-              {wordCount}/20 words minimum {isReasonValid && "✓"}
+              {wordCount}/5 words minimum {isReasonValid && "✓"}
             </Text>
           </div>
 

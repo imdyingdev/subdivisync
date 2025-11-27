@@ -21,7 +21,7 @@ import {
   PasswordInput,
   ScrollArea,
 } from "@mantine/core";
-import { IconEdit, IconUsers, IconSearch, IconEye, IconAlertCircle, IconCheck, IconX } from "@tabler/icons-react";
+import { IconEdit, IconUsers, IconSearch, IconEye, IconAlertCircle, IconCheck, IconX, IconTrash } from "@tabler/icons-react";
 import { Alert } from "@mantine/core";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-hot-toast";
@@ -107,6 +107,9 @@ const TenantsSection = () => {
   const [autoGeneratePassword, setAutoGeneratePassword] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingTenant, setDeletingTenant] = useState<Tenant | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!dataFetched) {
@@ -218,6 +221,33 @@ const TenantsSection = () => {
       .split("")
       .sort(() => Math.random() - 0.5)
       .join("");
+  };
+
+  const handleDeleteHomeowner = async () => {
+    if (!deletingTenant) return;
+    
+    setDeleteLoading(true);
+    try {
+      const response = await fetch(`/api/admin/delete-homeowner/${deletingTenant.user_id}`, {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to delete homeowner');
+      }
+      
+      toast.success('Homeowner deleted successfully');
+      setShowDeleteModal(false);
+      setDeletingTenant(null);
+      fetchTenants();
+    } catch (error) {
+      console.error('Error deleting homeowner:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete homeowner');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const handleEditTenant = (tenant: Tenant) => {
@@ -648,6 +678,16 @@ const TenantsSection = () => {
                         onClick={() => handleEditTenant(tenant)}
                       >
                         <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        onClick={() => {
+                          setDeletingTenant(tenant);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        <IconTrash size={16} />
                       </ActionIcon>
                     </Group>
                   </Table.Td>
@@ -1227,6 +1267,51 @@ const TenantsSection = () => {
               }}
             >
               Confirm & Create
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingTenant(null);
+        }}
+        title="Delete Homeowner"
+        centered
+        size="sm"
+      >
+        <Stack gap="md">
+          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
+            This action cannot be undone. The homeowner account will be permanently deleted.
+          </Alert>
+          
+          {deletingTenant && (
+            <Box>
+              <Text size="sm" c="dimmed" mb="xs">You are about to delete:</Text>
+              <Text fw={500}>{deletingTenant.user_name}</Text>
+              <Text size="sm" c="dimmed">{deletingTenant.user_email}</Text>
+            </Box>
+          )}
+
+          <Group justify="flex-end" mt="md">
+            <Button
+              variant="default"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletingTenant(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              loading={deleteLoading}
+              onClick={handleDeleteHomeowner}
+            >
+              Delete Homeowner
             </Button>
           </Group>
         </Stack>
