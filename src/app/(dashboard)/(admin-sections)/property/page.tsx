@@ -964,15 +964,15 @@ export default function PropertyManagement() {
                         </Group>
                       </Table.Td>
                       <Table.Td>
-                        <Badge variant="light" color="gray">
+                        <Badge variant="light" color="gray" size="xs" style={{ whiteSpace: 'nowrap' }}>
                           {property.type.replace("-", " ").toUpperCase()}
                         </Badge>
                       </Table.Td>
                       <Table.Td>
-                        <Text fw={500}>{property.size} SQM</Text>
+                        <Text size="sm" c="dimmed">{property.size} SQM</Text>
                       </Table.Td>
                       <Table.Td>
-                        <Text fw={700} c="green.6">
+                        <Text size="sm" fw={600} c="green.6">
                           {formatCurrency(property.price)}
                         </Text>
                       </Table.Td>
@@ -980,39 +980,44 @@ export default function PropertyManagement() {
                         <Badge
                           color={getStatusColor(property.status)}
                           variant="light"
+                          size="xs"
+                          style={{ whiteSpace: 'nowrap' }}
                         >
-                          {property.status}
+                          {property.status === "CREATED" ? "AVAILABLE" : property.status === "UNDER_INQUIRY" ? "INQUIRY" : property.status}
                         </Badge>
                       </Table.Td>
                       <Table.Td>
-                        <Group gap="xs">
+                        <Group gap={4} wrap="nowrap">
                           <ActionIcon
                             variant="light"
                             color="blue"
+                            size="sm"
                             onClick={() => {
                               setSelectedProperty(property);
                               setViewModalOpen(true);
                             }}
                           >
-                            <IconEye size={16} />
+                            <IconEye size={14} />
                           </ActionIcon>
                           {property.status !== "LEASED" && (
                             <>
                               <ActionIcon
                                 variant="light"
                                 color="yellow"
+                                size="sm"
                                 onClick={() => openEditModal(property)}
                               >
-                                <IconEdit size={16} />
+                                <IconEdit size={14} />
                               </ActionIcon>
                               <ActionIcon
                                 variant="light"
                                 color="red"
+                                size="sm"
                                 onClick={() =>
                                   handleDeleteProperty(property._id)
                                 }
                               >
-                                <IconX size={16} />
+                                <IconX size={14} />
                               </ActionIcon>
                             </>
                           )}
