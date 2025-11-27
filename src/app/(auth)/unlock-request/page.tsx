@@ -26,6 +26,7 @@ function UnlockRequestContent() {
   const emailFromUrl = searchParams.get("email") || "";
 
   const [email, setEmail] = useState(emailFromUrl);
+  const [name, setName] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -54,9 +55,7 @@ function UnlockRequestContent() {
         
         if (data.success) {
           setAccountStatus(data);
-          if (data.hasUnlockRequest && data.unlockRequestStatus === 'pending') {
-            setSubmitted(true);
-          }
+          // Don't auto-show submitted state - let user submit fresh request from email link
         }
       } catch (err) {
         console.error("Failed to check status:", err);
@@ -95,6 +94,7 @@ function UnlockRequestContent() {
         },
         body: JSON.stringify({
           email: email.trim(),
+          name: name.trim(),
           reason: reason.trim(),
         }),
       });
@@ -161,9 +161,13 @@ function UnlockRequestContent() {
           variant="light"
           className="mb-4"
         >
+          <Text size="sm" fw={500} mb={8}>
+            What happens next?
+          </Text>
           <Text size="sm">
-            An administrator will review your request and unlock your account if approved.
-            You will be notified once a decision is made.
+            An administrator will review your request within <strong>6 to 24 hours</strong>. 
+            Please wait patiently as your request is being processed. You will receive an 
+            email notification once your account has been unlocked.
           </Text>
         </Alert>
 
@@ -259,6 +263,21 @@ function UnlockRequestContent() {
             }}
           />
 
+          <TextInput
+            label="Full Name"
+            placeholder="Enter your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            disabled={loading}
+            styles={{
+              label: {
+                color: colorScheme === "dark" ? "#ffffff" : "#374151",
+                fontWeight: 500,
+              },
+            }}
+          />
+
           <div>
             <Textarea
               label="Reason for Unlock Request"
@@ -300,7 +319,7 @@ function UnlockRequestContent() {
             type="submit"
             fullWidth
             loading={loading}
-            disabled={loading || !email.trim() || !isReasonValid}
+            disabled={loading || !email.trim() || !name.trim() || !isReasonValid}
           >
             Submit Unlock Request
           </Button>

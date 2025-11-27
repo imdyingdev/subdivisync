@@ -361,20 +361,9 @@ export function LoginForm() {
             Your account has been locked for security reasons. An email has been sent 
             to your registered email address with instructions to request an unlock.
           </Text>
-          <Text size="xs" c="red.7" fw={600} className="mb-2">
-            Failed attempts: {failedLoginCount}/3
+          <Text size="xs" c="dark.5" className="mb-1">
+            Please check your email inbox for the unlock request form link.
           </Text>
-          <Link
-            href={`/unlock-request?email=${encodeURIComponent(formData.email)}`}
-            style={{
-              color: '#2563eb',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              textDecoration: 'underline',
-            }}
-          >
-            Request Account Unlock →
-          </Link>
         </Alert>
       )}
 

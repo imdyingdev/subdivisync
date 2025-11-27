@@ -3,6 +3,7 @@ import mongoose, { Document, Model } from "mongoose";
 
 export interface IUnlockRequest {
   email: string;
+  name?: string;
   reason: string;
   submittedAt: Date;
   status: 'pending' | 'approved' | 'rejected' | 'needs_more_info';
@@ -96,6 +97,7 @@ const UserSecuritySchema = new mongoose.Schema<IUserSecurityDocument>(
     },
     unlockRequest: {
       email: { type: String },
+      name: { type: String },
       reason: { type: String, maxLength: 1000 },
       submittedAt: { type: Date },
       status: { 

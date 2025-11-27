@@ -81,14 +81,38 @@ export async function GET(request: NextRequest) {
 
     // Fetch user details from Better-Auth user collection in bulk
     const usersCollection = db.collection("user");
+    const { ObjectId } = await import("mongodb");
+    
+    // Separate valid ObjectIds from regular IDs
+    const objectIds: any[] = [];
+    const regularIds: string[] = [];
+    
+    userIds.forEach(id => {
+      if (ObjectId.isValid(id) && id.length === 24) {
+        objectIds.push(new ObjectId(id));
+      }
+      regularIds.push(id);
+    });
+    
     const users = await usersCollection
-      .find({ id: { $in: userIds } })
+      .find({
+        $or: [
+          { id: { $in: regularIds } },
+          { _id: { $in: objectIds } }
+        ]
+      })
       .toArray();
 
-    // Create a map for quick lookup
-    const userMap = new Map(
-      users.map((user) => [user.id, { email: user.email, name: user.name }])
-    );
+    // Create a map for quick lookup - map by both id and _id.toString()
+    const userMap = new Map<string, { email: string; name: string }>();
+    users.forEach((user) => {
+      if (user.id) {
+        userMap.set(user.id, { email: user.email, name: user.name });
+      }
+      if (user._id) {
+        userMap.set(user._id.toString(), { email: user.email, name: user.name });
+      }
+    });
 
     // Enrich accounts with user data
     const formattedAccounts = lockedAccounts.map((account) => {

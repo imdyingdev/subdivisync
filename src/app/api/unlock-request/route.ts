@@ -9,6 +9,7 @@ import { sendEmail } from "@/resend/resend";
 // Validation schema for unlock request submission
 const UnlockRequestSchema = z.object({
   email: z.string().email(),
+  name: z.string().min(1, "Name is required").optional(),
   reason: z.string().min(20, "Reason must be at least 20 characters"),
 });
 
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
-    const { email, reason } = UnlockRequestSchema.parse(body);
+    const { email, name, reason } = UnlockRequestSchema.parse(body);
 
     // Find the user
     const user = await findUserByEmail(email);
@@ -60,17 +61,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if there's already a pending request
-    if (userSecurity.unlockRequest?.status === 'pending') {
-      return NextResponse.json(
-        { success: false, message: "You already have a pending unlock request" },
-        { status: 400 }
-      );
-    }
-
-    // Save the unlock request
+    // Save the unlock request (overwrite any existing one - user may be resubmitting from email)
     userSecurity.unlockRequest = {
       email,
+      name: name || user.name,
       reason,
       submittedAt: new Date(),
       status: 'pending',
