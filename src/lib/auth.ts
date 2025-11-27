@@ -76,11 +76,45 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">SubdiviSync</h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 14px;">Password Reset Request</p>
+              </div>
+              <div style="padding: 30px;">
+                <p style="color: #374151; font-size: 16px; margin: 0 0 20px 0;">Hello ${user.name || 'there'},</p>
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                  We received a request to reset your password for your SubdiviSync account. Click the button below to set a new password:
+                </p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${url}" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: 600;">Reset Password</a>
+                </div>
+                <p style="color: #9ca3af; font-size: 12px; line-height: 1.6; margin: 20px 0 0 0;">
+                  If you didn't request this password reset, you can safely ignore this email. This link will expire in 1 hour.
+                </p>
+              </div>
+              <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <p style="color: #9ca3af; margin: 0; font-size: 11px;">&copy; ${new Date().getFullYear()} SubdiviSync. All rights reserved.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
       await sendEmail({
         to: [{ email: user.email, name: user.name }],
-        subject: "Reset your password",
-        htmlContent: `<p>Click the link to reset your password: <a href="${url}">${url}</a></p>`,
-        textContent: `Click the link to reset your password: ${url}`,
+        subject: "Reset Your SubdiviSync Password",
+        htmlContent,
+        textContent: `Hello ${user.name || 'there'}, We received a request to reset your password. Visit this link to reset: ${url}. If you didn't request this, you can ignore this email.`,
         sender: {
           email: process.env.BREVO_SENDER_EMAIL!,
           name: "SubdiviSync"
@@ -91,11 +125,45 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">SubdiviSync</h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 14px;">Email Verification</p>
+              </div>
+              <div style="padding: 30px;">
+                <p style="color: #374151; font-size: 16px; margin: 0 0 20px 0;">Welcome ${user.name || 'there'}!</p>
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                  Thank you for creating a SubdiviSync account. Please verify your email address by clicking the button below:
+                </p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${url}" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: 600;">Verify Email Address</a>
+                </div>
+                <p style="color: #9ca3af; font-size: 12px; line-height: 1.6; margin: 20px 0 0 0;">
+                  If you didn't create a SubdiviSync account, you can safely ignore this email.
+                </p>
+              </div>
+              <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <p style="color: #9ca3af; margin: 0; font-size: 11px;">&copy; ${new Date().getFullYear()} SubdiviSync. All rights reserved.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
       await sendEmail({
         to: [{ email: user.email, name: user.name }],
-        subject: "Verify your email address",
-        htmlContent: `<p>Click the link to verify your email: <a href="${url}">${url}</a></p>`,
-        textContent: `Click the link to verify your email: ${url}`,
+        subject: "Verify Your SubdiviSync Email Address",
+        htmlContent,
+        textContent: `Welcome ${user.name || 'there'}! Thank you for creating a SubdiviSync account. Verify your email by visiting: ${url}`,
         sender: {
           email: process.env.BREVO_SENDER_EMAIL!,
           name: "SubdiviSync"
@@ -112,11 +180,45 @@ export const auth = betterAuth({
       skipVerificationOnEnable: true,
       otpOptions: {
         async sendOTP({ user, otp }) {
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  <div style="background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); padding: 30px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">SubdiviSync</h1>
+                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 14px;">Two-Factor Authentication</p>
+                  </div>
+                  <div style="padding: 30px; text-align: center;">
+                    <p style="color: #374151; font-size: 16px; margin: 0 0 20px 0;">Hello ${user.name || 'there'},</p>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                      Your verification code for SubdiviSync is:
+                    </p>
+                    <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                      <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #1f2937;">${otp}</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 12px; line-height: 1.6; margin: 20px 0 0 0;">
+                      This code will expire in 5 minutes. If you didn't request this code, please secure your account immediately.
+                    </p>
+                  </div>
+                  <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; margin: 0; font-size: 11px;">&copy; ${new Date().getFullYear()} SubdiviSync. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            </body>
+            </html>
+          `;
           await sendEmail({
             to: [{ email: user.email, name: user.name }],
-            subject: "2FA Verification",
-            htmlContent: `<p>Your verification code is: <strong>${otp}</strong></p>`,
-            textContent: `Verify your OTP: ${otp}`,
+            subject: "Your SubdiviSync Verification Code",
+            htmlContent,
+            textContent: `Your SubdiviSync verification code is: ${otp}. This code expires in 5 minutes.`,
             sender: {
               email: process.env.BREVO_SENDER_EMAIL!,
               name: "SubdiviSync"
