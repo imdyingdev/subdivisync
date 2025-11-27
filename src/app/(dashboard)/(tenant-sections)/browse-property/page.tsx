@@ -417,26 +417,24 @@ const PropertyListingPage = () => {
                 )}
               </AspectRatio>
 
-              <Stack gap="xs" mt="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <Stack gap={4} mt="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Badge
                   color={getStatusColor(property.status)}
                   variant="light"
                   size="xs"
-                  style={{ alignSelf: 'flex-end', marginBottom: 4 }}
+                  style={{ alignSelf: 'flex-end' }}
                 >
                   {getStatusMessage(property.status)}
                 </Badge>
-                <Title order={4} fw={600} c={primaryTextColor}>
+                <Title order={4} fw={600} c={primaryTextColor} style={{ marginTop: -4 }}>
                   {property.title}
                 </Title>
-
-                <Group gap="xs">
-                  <IconMapPin size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                  <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                <Group gap={4}>
+                  <IconMapPin size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                  <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                     {property.location}
                   </Text>
                 </Group>
-
                 <Group gap={4}>
                   <Text size="xs" c="dimmed">House Price:</Text>
                   <Text fw={700} size="md" c="green">
@@ -567,16 +565,19 @@ const PropertyListingPage = () => {
                 )}
               </AspectRatio>
 
-              <Group gap="xs">
-                <IconMapPin size={18} color="gray" />
-                <Text size="md" c="dimmed">
+              <Group gap={4}>
+                <IconMapPin size={16} color="gray" />
+                <Text size="sm" c="dimmed">
                   {selectedProperty.location}
                 </Text>
               </Group>
 
-              <Text fw={700} size="xl" c="green">
-                ₱{selectedProperty.price.toLocaleString("en-PH")}
-              </Text>
+              <Group gap={4}>
+                <Text size="sm" c="dimmed">House Price:</Text>
+                <Text fw={700} size="lg" c="green">
+                  ₱{selectedProperty.price.toLocaleString("en-PH")}
+                </Text>
+              </Group>
 
               <SimpleGrid cols={2}>
                 <Group gap="xs">
