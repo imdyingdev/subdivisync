@@ -24,6 +24,7 @@ function UnlockRequestContent() {
   const { colorScheme } = useMantineColorScheme();
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get("email") || "";
+  const tokenFromUrl = searchParams.get("token") || "";
 
   const [email, setEmail] = useState(emailFromUrl);
   const [name, setName] = useState("");
@@ -36,36 +37,46 @@ function UnlockRequestContent() {
     accountLocked: boolean;
     hasUnlockRequest: boolean;
     unlockRequestStatus?: string;
+    tokenValid?: boolean;
   } | null>(null);
+  const [invalidLink, setInvalidLink] = useState(false);
+  const [invalidLinkMessage, setInvalidLinkMessage] = useState("");
 
   const paperBg = colorScheme === "dark" ? theme.colors.dark[6] : theme.white;
   const subTextColor = colorScheme === "dark" ? theme.colors.gray[4] : theme.colors.gray[6];
 
-  // Check account status on load
+  // Check account status and token validity on load
   useEffect(() => {
     const checkStatus = async () => {
-      if (!emailFromUrl) {
+      // Require both email and token
+      if (!emailFromUrl || !tokenFromUrl) {
+        setInvalidLink(true);
+        setInvalidLinkMessage("Invalid unlock request link. Please use the link from your email.");
         setCheckingStatus(false);
         return;
       }
 
       try {
-        const response = await fetch(`/api/unlock-request?email=${encodeURIComponent(emailFromUrl)}`);
+        const response = await fetch(`/api/unlock-request?email=${encodeURIComponent(emailFromUrl)}&token=${encodeURIComponent(tokenFromUrl)}`);
         const data = await response.json();
         
-        if (data.success) {
+        if (data.success && data.tokenValid) {
           setAccountStatus(data);
-          // Don't auto-show submitted state - let user submit fresh request from email link
+        } else {
+          setInvalidLink(true);
+          setInvalidLinkMessage(data.message || "Invalid or expired unlock link.");
         }
       } catch (err) {
         console.error("Failed to check status:", err);
+        setInvalidLink(true);
+        setInvalidLinkMessage("Failed to verify unlock link. Please try again.");
       } finally {
         setCheckingStatus(false);
       }
     };
 
     checkStatus();
-  }, [emailFromUrl]);
+  }, [emailFromUrl, tokenFromUrl]);
 
   const wordCount = reason.trim().split(/\s+/).filter(Boolean).length;
   const isReasonValid = wordCount >= 20;
@@ -96,6 +107,7 @@ function UnlockRequestContent() {
           email: email.trim(),
           name: name.trim(),
           reason: reason.trim(),
+          token: tokenFromUrl,
         }),
       });
 
@@ -120,6 +132,59 @@ function UnlockRequestContent() {
       <Center style={{ minHeight: "50vh" }}>
         <Loader size="lg" />
       </Center>
+    );
+  }
+
+  if (invalidLink) {
+    return (
+      <Paper
+        className="w-full max-w-md mx-auto"
+        p="xl"
+        radius="md"
+        withBorder
+        style={{ backgroundColor: paperBg }}
+      >
+        <div className="text-center mb-6">
+          <div
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: "50%",
+              backgroundColor: theme.colors.red[0],
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}
+          >
+            <IconAlertCircle size={32} color={theme.colors.red[6]} />
+          </div>
+          <Title order={2} className="text-xl mb-2" c={colorScheme === "dark" ? "white" : "dark"}>
+            Invalid Link
+          </Title>
+          <Text size="sm" style={{ color: subTextColor }}>
+            {invalidLinkMessage}
+          </Text>
+        </div>
+
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          color="orange"
+          variant="light"
+          className="mb-4"
+        >
+          <Text size="sm">
+            If your account is locked, please check your email for the unlock request link. 
+            If you need assistance, please contact support.
+          </Text>
+        </Alert>
+
+        <Link href="/login">
+          <Button variant="filled" fullWidth>
+            Back to Login
+          </Button>
+        </Link>
+      </Paper>
     );
   }
 

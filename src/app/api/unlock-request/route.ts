@@ -11,6 +11,7 @@ const UnlockRequestSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1, "Name is required").optional(),
   reason: z.string().min(20, "Reason must be at least 20 characters"),
+  token: z.string().min(1, "Token is required"),
 });
 
 // Helper function to find user by email
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
-    const { email, name, reason } = UnlockRequestSchema.parse(body);
+    const { email, name, reason, token } = UnlockRequestSchema.parse(body);
 
     // Find the user
     const user = await findUserByEmail(email);
@@ -58,6 +59,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, message: "This account is not locked" },
         { status: 400 }
+      );
+    }
+
+    // Validate the token
+    if (!userSecurity.unlockToken || userSecurity.unlockToken !== token) {
+      return NextResponse.json(
+        { success: false, message: "Invalid or expired unlock link. Please use the link from your email." },
+        { status: 403 }
+      );
+    }
+
+    // Check if token is expired
+    if (userSecurity.unlockTokenExpires && new Date() > userSecurity.unlockTokenExpires) {
+      return NextResponse.json(
+        { success: false, message: "This unlock link has expired. Please contact support for a new link." },
+        { status: 403 }
       );
     }
 
@@ -102,10 +119,11 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
+    const token = searchParams.get("token");
 
-    if (!email) {
+    if (!email || !token) {
       return NextResponse.json(
-        { success: false, message: "Email is required" },
+        { success: false, message: "Invalid unlock request link" },
         { status: 400 }
       );
     }
@@ -130,12 +148,29 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Validate the token
+    if (!userSecurity.unlockToken || userSecurity.unlockToken !== token) {
+      return NextResponse.json(
+        { success: false, message: "Invalid unlock link. Please use the link from your email." },
+        { status: 403 }
+      );
+    }
+
+    // Check if token is expired
+    if (userSecurity.unlockTokenExpires && new Date() > userSecurity.unlockTokenExpires) {
+      return NextResponse.json(
+        { success: false, message: "This unlock link has expired. Please contact support." },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       accountLocked: userSecurity.accountLocked,
       hasUnlockRequest: !!userSecurity.unlockRequest,
       unlockRequestStatus: userSecurity.unlockRequest?.status,
       lockedAt: userSecurity.lockedAt,
+      tokenValid: true,
     });
 
   } catch (error) {

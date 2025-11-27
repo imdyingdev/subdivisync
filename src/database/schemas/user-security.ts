@@ -24,6 +24,8 @@ export interface IUserSecurity {
   lastSuccessfulLogin?: Date;
   ipAddress?: string; // Last IP that attempted login
   lockEmailSent?: boolean; // Whether the lock notification email was sent
+  unlockToken?: string; // Token for secure unlock request access
+  unlockTokenExpires?: Date; // Token expiration time
   unlockRequest?: IUnlockRequest; // Homeowner's unlock request
   createdAt: Date;
   updatedAt: Date;
@@ -94,6 +96,12 @@ const UserSecuritySchema = new mongoose.Schema<IUserSecurityDocument>(
     lockEmailSent: {
       type: Boolean,
       default: false
+    },
+    unlockToken: {
+      type: String
+    },
+    unlockTokenExpires: {
+      type: Date
     },
     unlockRequest: {
       email: { type: String },

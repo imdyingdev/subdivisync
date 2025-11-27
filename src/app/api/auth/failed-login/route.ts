@@ -6,6 +6,7 @@ import { UserSecurityModel } from "@/database/schemas/user-security";
 import { connectDB } from "@/database/mongodb";
 import { z } from "zod";
 import { sendEmail } from "@/resend/resend";
+import crypto from "crypto";
 
 // Validation schema for the request
 const FailedLoginSchema = z.object({
@@ -39,10 +40,15 @@ async function checkIfUserExists(email: string): Promise<{ userId: string; role?
   }
 }
 
+// Helper function to generate a secure token
+function generateUnlockToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
 // Helper function to send account lock notification email
-async function sendAccountLockEmail(email: string, userName?: string) {
+async function sendAccountLockEmail(email: string, userName?: string, token?: string) {
   const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-  const unlockRequestUrl = `${baseUrl}/unlock-request?email=${encodeURIComponent(email)}`;
+  const unlockRequestUrl = `${baseUrl}/unlock-request?email=${encodeURIComponent(email)}${token ? `&token=${token}` : ''}`;
   
   const htmlContent = `
     <!DOCTYPE html>
@@ -197,14 +203,21 @@ export async function POST(request: NextRequest) {
 
     // Lock account if attempts reach 3
     if (userSecurity.failedLoginCount >= 3) {
+      // Generate a secure token for unlock request access
+      const unlockToken = generateUnlockToken();
+      const tokenExpiry = new Date();
+      tokenExpiry.setDate(tokenExpiry.getDate() + 7); // Token valid for 7 days
+      
       userSecurity.accountLocked = true;
       userSecurity.lockedAt = new Date();
       userSecurity.lockedReason = "Automatic lockout due to 3 failed login attempts";
+      userSecurity.unlockToken = unlockToken;
+      userSecurity.unlockTokenExpires = tokenExpiry;
       shouldLock = true;
       attemptsRemaining = 0;
       
-      // Send lock notification email (async, don't wait for it)
-      sendAccountLockEmail(email, userName).then((sent) => {
+      // Send lock notification email with token (async, don't wait for it)
+      sendAccountLockEmail(email, userName, unlockToken).then((sent) => {
         if (sent) {
           // Update the record to mark email as sent
           UserSecurityModel.updateOne(

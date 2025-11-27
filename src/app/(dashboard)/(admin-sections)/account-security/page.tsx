@@ -31,8 +31,6 @@ import {
   IconExclamationCircle,
   IconInfoCircle,
   IconAlertTriangle,
-  IconEye,
-  IconMail,
 } from "@tabler/icons-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-hot-toast";
@@ -83,8 +81,6 @@ const AccountSecuritySection = () => {
   const [showMigrationModal, setShowMigrationModal] = useState(false);
   const [migrationLoading, setMigrationLoading] = useState(false);
   const [collectionExists, setCollectionExists] = useState(true);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [resendingEmail, setResendingEmail] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     limit: 10,
@@ -331,51 +327,6 @@ const AccountSecuritySection = () => {
     setShowUnlockModal(true);
   };
 
-  const openViewModal = (account: LockedAccount) => {
-    setSelectedAccount(account);
-    setShowViewModal(true);
-  };
-
-  const handleResendEmail = async () => {
-    if (!selectedAccount?.userEmail) {
-      toast.error("No email address found for this account");
-      return;
-    }
-
-    setResendingEmail(true);
-    try {
-      const response = await fetch("/api/admin/resend-unlock-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: selectedAccount.userEmail,
-          userName: selectedAccount.userName,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to resend email");
-      }
-
-      toast.success("Email sent successfully! User can resubmit their reason.");
-      setShowViewModal(false);
-      await fetchLockedAccounts();
-    } catch (error) {
-      console.error("Resend email error:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to resend email. Please try again."
-      );
-    } finally {
-      setResendingEmail(false);
-    }
-  };
-
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
@@ -563,27 +514,15 @@ const AccountSecuritySection = () => {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Group gap={4}>
-                      {account.unlockRequest && (
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
-                          onClick={() => openViewModal(account)}
-                          title="View Unlock Request"
-                        >
-                          <IconEye size={16} />
-                        </ActionIcon>
-                      )}
-                      <ActionIcon
-                        variant="light"
-                        color="green"
-                        onClick={() => openUnlockModal(account)}
-                        title="Unlock Account"
-                        disabled={!account.userId && !account.userEmail}
-                      >
-                        <IconLockOpen size={16} />
-                      </ActionIcon>
-                    </Group>
+                    <ActionIcon
+                      variant="light"
+                      color="green"
+                      onClick={() => openUnlockModal(account)}
+                      title="Unlock Account"
+                      disabled={!account.userId && !account.userEmail}
+                    >
+                      <IconLockOpen size={16} />
+                    </ActionIcon>
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -845,126 +784,6 @@ const AccountSecuritySection = () => {
               Unlock Account
             </Button>
           </Group>
-        </Stack>
-      </Modal>
-
-      {/* View Unlock Request Modal */}
-      <Modal
-        opened={showViewModal}
-        onClose={() => {
-          setShowViewModal(false);
-          setSelectedAccount(null);
-        }}
-        title={
-          <Group>
-            <IconEye size={20} color="blue" />
-            <Text>View Unlock Request</Text>
-          </Group>
-        }
-        size="md"
-      >
-        <Stack>
-          {selectedAccount && (
-            <>
-              <Paper p="lg" withBorder style={{ backgroundColor: "#f8f9fa" }}>
-                <Stack gap="md">
-                  <Box>
-                    <Text size="xs" c="dimmed" fw={500} mb={4}>
-                      Name
-                    </Text>
-                    <Text size="sm" fw={500} c="dark">
-                      {selectedAccount.userName || "Unknown"}
-                    </Text>
-                    {selectedAccount.userEmail && (
-                      <Text size="xs" c="blue.6" mt={4}>
-                        {selectedAccount.userEmail}
-                      </Text>
-                    )}
-                  </Box>
-
-                  <Box>
-                    <Text size="xs" c="dimmed" fw={500} mb={4}>
-                      Locked Date
-                    </Text>
-                    <Text size="sm" fw={500} c="dark">
-                      {formatDate(selectedAccount.lockedAt)}
-                    </Text>
-                  </Box>
-                </Stack>
-              </Paper>
-
-              {selectedAccount.unlockRequest && (
-                <Box>
-                  <Text size="sm" fw={600} mb={8}>
-                    Homeowner&apos;s Unlock Request
-                  </Text>
-                  <Paper p="md" withBorder style={{ backgroundColor: "#e7f5ff" }}>
-                    <Text size="sm" c="dark" style={{ whiteSpace: "pre-wrap" }}>
-                      {selectedAccount.unlockRequest.reason}
-                    </Text>
-                    <Text size="xs" c="dimmed" mt={8}>
-                      Submitted: {formatDate(selectedAccount.unlockRequest.submittedAt)}
-                    </Text>
-                    <Badge 
-                      size="sm" 
-                      color={
-                        selectedAccount.unlockRequest.status === 'pending' ? 'yellow' :
-                        selectedAccount.unlockRequest.status === 'approved' ? 'green' :
-                        selectedAccount.unlockRequest.status === 'needs_more_info' ? 'orange' : 'red'
-                      }
-                      mt={8}
-                    >
-                      {selectedAccount.unlockRequest.status.replace('_', ' ').toUpperCase()}
-                    </Badge>
-                  </Paper>
-                </Box>
-              )}
-
-              <Alert
-                icon={<IconInfoCircle size={16} />}
-                color="blue"
-                variant="light"
-              >
-                <Text size="xs">
-                  If the reason provided is not sufficient, you can request the homeowner to 
-                  provide more details by clicking the button below.
-                </Text>
-              </Alert>
-
-              <Group justify="space-between" mt="md">
-                <Button
-                  variant="light"
-                  color="orange"
-                  leftSection={<IconMail size={16} />}
-                  onClick={handleResendEmail}
-                  loading={resendingEmail}
-                >
-                  Request More Info
-                </Button>
-                <Group>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      setShowViewModal(false);
-                      setSelectedAccount(null);
-                    }}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    color="green"
-                    leftSection={<IconLockOpen size={16} />}
-                    onClick={() => {
-                      setShowViewModal(false);
-                      openUnlockModal(selectedAccount);
-                    }}
-                  >
-                    Unlock Account
-                  </Button>
-                </Group>
-              </Group>
-            </>
-          )}
         </Stack>
       </Modal>
     </Container>
