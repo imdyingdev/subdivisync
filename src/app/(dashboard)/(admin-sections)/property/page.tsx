@@ -400,12 +400,30 @@ export default function PropertyManagement() {
   //     });
   //   }
   // }, [editFormData.type]);
+  // Helper to format price with commas for display
+  const formatPriceInput = (value: string): string => {
+    // Remove all non-digit characters except decimal point
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    // Split by decimal point
+    const parts = cleanValue.split('.');
+    // Format the integer part with commas
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  };
+
+  // Helper to strip commas from price for validation/submission
+  const stripCommas = (value: string): string => {
+    return value.replace(/,/g, '');
+  };
+
   const validateForm = (data: CreatePropertyRequest): string | null => {
     if (!data.title.trim()) return "Property title is required";
     if (!data.location.trim()) return "Location is required";
     if (!data.size.trim()) return "Size is required";
     if (!data.price.trim()) return "Price is required";
-    if (!/^\d+(\.\d+)?$/.test(data.price))
+    // Strip commas before validating
+    const cleanPrice = stripCommas(data.price);
+    if (!/^\d+(\.\d+)?$/.test(cleanPrice))
       return "Price must be a valid number";
     return null;
   };
@@ -464,6 +482,7 @@ export default function PropertyManagement() {
       }
       const requestBody: CreatePropertyRequest = {
         ...formData,
+        price: stripCommas(formData.price), // Remove commas before sending to API
         images: [...(formData.images || []), ...imageUrls],
         status: formData.status as
           | "CREATED"
@@ -549,7 +568,7 @@ export default function PropertyManagement() {
         title: editFormData.title,
         location: editFormData.location,
         size: editFormData.size,
-        price: editFormData.price,
+        price: stripCommas(editFormData.price), // Remove commas before sending to API
         type: editFormData.type,
         status: editFormData.status,
         images: [...(editFormData.images || []), ...newImageUrls],
@@ -702,7 +721,7 @@ export default function PropertyManagement() {
       title: property.title,
       location: property.location,
       size: property.size,
-      price: property.price.toString(),
+      price: formatPriceInput(property.price.toString()),
       type: property.type,
       status: property.status,
       images: property.images || [],
@@ -1066,10 +1085,10 @@ export default function PropertyManagement() {
             />
             <TextInput
               label="Price *"
-              placeholder="e.g., 2500000"
+              placeholder="e.g., 2,500,000"
               value={formData.price}
               onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
+                setFormData({ ...formData, price: formatPriceInput(e.target.value) })
               }
               required
             />
@@ -1424,10 +1443,10 @@ export default function PropertyManagement() {
             />
             <TextInput
               label="Price *"
-              placeholder="e.g., 2500000"
+              placeholder="e.g., 2,500,000"
               value={editFormData.price}
               onChange={(e) =>
-                setEditFormData({ ...editFormData, price: e.target.value })
+                setEditFormData({ ...editFormData, price: formatPriceInput(e.target.value) })
               }
               required
             />
