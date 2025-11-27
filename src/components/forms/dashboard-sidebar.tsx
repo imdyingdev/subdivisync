@@ -393,11 +393,10 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           height: "100dvh",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
           position: "relative",
         }}
       >
-        <AppShell.Section style={{ flexShrink: 0 }}>
+        <AppShell.Section>
           <Group justify="space-between" mb="md">
             {!collapsed && (
               <div>
@@ -449,15 +448,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Group>
         </AppShell.Section>
 
-        <Divider mb="md" />
+        <Divider mb="xs" />
 
-        <AppShell.Section 
-          grow 
-          component={ScrollArea} 
-          type="auto" 
-          scrollbarSize={6}
-          style={{ flex: 1, minHeight: 0, overflow: 'auto' }}
-        >
+        <AppShell.Section grow component={ScrollArea} type="auto" scrollbarSize={6} style={{ minHeight: 0, flex: 1 }}>
           <Stack gap="xs">
             {navItems.map((item) => (
               <Tooltip
@@ -552,9 +545,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Stack>
         </AppShell.Section>
 
-        <Divider my="md" />
+        <Divider my="xs" />
 
-        <AppShell.Section style={{ flexShrink: 0 }}>
+        <AppShell.Section style={{ flexShrink: 0, paddingBottom: '8px' }}>
           <Group wrap="nowrap" gap="xs" style={{ overflow: 'visible' }}>
             <Avatar src={userImage} radius="xl" size="sm" style={{ flexShrink: 0 }}>
               {!userImage && userName.charAt(0).toUpperCase()}
