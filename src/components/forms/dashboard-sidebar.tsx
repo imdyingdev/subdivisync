@@ -293,6 +293,14 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
       description: "Admin Account",
       notificationCount: 0,
     },
+    {
+      icon: IconLogout,
+      label: "Logout",
+      href: "#",
+      description: "Sign Out",
+      notificationCount: 0,
+      isLogout: true,
+    },
   ];
 
   // Tenant navigation items
@@ -338,6 +346,14 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
       href: "/homeowner-profile", // Keep this path
       description: "My Account",
       notificationCount: 0,
+    },
+    {
+      icon: IconLogout,
+      label: "Logout",
+      href: "#",
+      description: "Sign Out",
+      notificationCount: 0,
+      isLogout: true,
     },
   ];
 
@@ -390,7 +406,8 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
         bg={colorScheme === "dark" ? "dark.8" : "white"}
         withBorder
         style={{ 
-          height: "100dvh",
+          height: "100vh",
+          maxHeight: "100vh",
           display: "flex",
           flexDirection: "column",
         }}
@@ -464,11 +481,19 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                 openDelay={300}
               >
                 <NavLink
-                  component={Link}
-                  href={item.href}
+                  component={(item as any).isLogout ? "button" : Link}
+                  href={(item as any).isLogout ? undefined : item.href}
                   active={pathname === item.href}
                   label={collapsed ? "" : item.label}
-                  onClick={() => setOpened(false)}
+                  onClick={(e: any) => {
+                    if ((item as any).isLogout) {
+                      e.preventDefault();
+                      setShowLogoutModal(true);
+                      setOpened(false);
+                    } else {
+                      setOpened(false);
+                    }
+                  }}
                   leftSection={<item.icon size="1.2rem" stroke={1.5} />}
                   rightSection={
                     !collapsed && (
@@ -499,8 +524,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                   style={collapsed ? { justifyContent: "center" } : undefined}
                   styles={{
                     root: {
-                      color:
-                        colorScheme === "dark"
+                      color: (item as any).isLogout
+                        ? theme.colors.red[6]
+                        : colorScheme === "dark"
                           ? theme.colors.gray[4]
                           : theme.colors.dark[9],
                       backgroundColor:
@@ -510,8 +536,11 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                             : theme.colors.blue[0]
                           : "transparent",
                       "&:hover": {
-                        backgroundColor:
-                          colorScheme === "dark"
+                        backgroundColor: (item as any).isLogout
+                          ? colorScheme === "dark"
+                            ? theme.colors.red[9]
+                            : theme.colors.red[0]
+                          : colorScheme === "dark"
                             ? theme.colors.dark[5]
                             : theme.colors.gray[0],
                       },
@@ -544,9 +573,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Stack>
         </AppShell.Section>
 
-        <Divider my="md" style={{ flexShrink: 0 }} />
+        <Divider my="md" style={{ flexShrink: 0 }} visibleFrom="sm" />
 
-        <AppShell.Section style={{ flexShrink: 0 }}>
+        <AppShell.Section style={{ flexShrink: 0 }} visibleFrom="sm">
           <Group wrap="nowrap" gap="xs">
             <Avatar src={userImage} radius="xl" size="sm">
               {!userImage && userName.charAt(0).toUpperCase()}
