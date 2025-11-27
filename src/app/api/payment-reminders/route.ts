@@ -28,57 +28,104 @@ export async function POST() {
           (1000 * 60 * 60 * 24)
       );
 
+      const dueDateFormatted = new Date(payment.dueDate).toLocaleDateString("en-PH", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const amountFormatted = `₱${payment.amount.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
+
       try {
         await sendEmail({
           to: [{ 
             email: payment.tenantEmail, 
             name: payment.tenantName 
           }],
-          subject: `Payment Reminder: Due in ${daysUntilDue} day${daysUntilDue > 1 ? "s" : ""}`,
+          subject: `SubdiviSync Payment Reminder - Due ${dueDateFormatted}`,
           htmlContent: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #2563eb;">Payment Reminder</h2>
-              <p>Dear ${payment.tenantName},</p>
-              <p>This is a friendly reminder that your monthly payment is due soon.</p>
-              
-              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="margin-top: 0;">Payment Details</h3>
-                <p><strong>Property:</strong> ${payment.propertyTitle}</p>
-                <p><strong>Amount Due:</strong> ₱${payment.amount.toLocaleString("en-PH", { minimumFractionDigits: 2 })}</p>
-                <p><strong>Due Date:</strong> ${new Date(
-                  payment.dueDate
-                ).toLocaleDateString("en-PH", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}</p>
-                <p><strong>Days Until Due:</strong> ${daysUntilDue} day${daysUntilDue > 1 ? "s" : ""}</p>
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header -->
+                  <div style="background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%); padding: 30px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">SubdiviSync</h1>
+                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 14px;">Payment Reminder</p>
+                  </div>
+                  
+                  <!-- Content -->
+                  <div style="padding: 30px;">
+                    <p style="color: #374151; font-size: 16px; margin: 0 0 20px 0;">Hello ${payment.tenantName},</p>
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                      This is a friendly reminder that your monthly payment is due in <strong>${daysUntilDue} day${daysUntilDue > 1 ? "s" : ""}</strong>.
+                    </p>
+                    
+                    <!-- Payment Details -->
+                    <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                      <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                          <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Property:</td>
+                          <td style="padding: 10px 0; color: #111827; font-size: 14px; text-align: right; font-weight: 500;">${payment.propertyTitle}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 10px 0; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb;">Amount Due:</td>
+                          <td style="padding: 10px 0; color: #16a34a; font-size: 16px; text-align: right; font-weight: 700; border-top: 1px solid #e5e7eb;">${amountFormatted}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 10px 0; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb;">Due Date:</td>
+                          <td style="padding: 10px 0; color: #111827; font-size: 14px; text-align: right; font-weight: 500; border-top: 1px solid #e5e7eb;">${dueDateFormatted}</td>
+                        </tr>
+                      </table>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0;">
+                      Please ensure your payment is made on or before the due date to avoid late fees.
+                    </p>
+                    <p style="color: #9ca3af; font-size: 12px; line-height: 1.6; margin: 20px 0 0 0;">
+                      If you have already made this payment, please disregard this notice.
+                    </p>
+                  </div>
+                  
+                  <!-- Footer -->
+                  <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 12px;">Best regards,</p>
+                    <p style="color: #374151; margin: 0; font-size: 14px; font-weight: 500;">SubdiviSync Management</p>
+                  </div>
+                  
+                </div>
+                
+                <!-- Email Footer -->
+                <div style="text-align: center; padding: 20px;">
+                  <p style="color: #9ca3af; margin: 0; font-size: 11px;">&copy; ${new Date().getFullYear()} SubdiviSync. All rights reserved.</p>
+                </div>
               </div>
-              
-              <p>Please ensure your payment is made on or before the due date to avoid late fees.</p>
-              <p>If you have already made this payment, please disregard this notice.</p>
-              
-              <p style="margin-top: 30px;">Best regards,<br/>SubdivisSync Management</p>
-            </div>
+            </body>
+            </html>
           `,
-          textContent: `
-Payment Reminder
+          textContent: `SubdiviSync Payment Reminder
 
-Dear ${payment.tenantName},
+Hello ${payment.tenantName},
 
-This is a friendly reminder that your monthly payment is due soon.
+This is a friendly reminder that your monthly payment is due in ${daysUntilDue} day${daysUntilDue > 1 ? "s" : ""}.
 
 Payment Details:
 - Property: ${payment.propertyTitle}
-- Amount Due: ₱${payment.amount.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
-- Due Date: ${new Date(payment.dueDate).toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
-- Days Until Due: ${daysUntilDue} day${daysUntilDue > 1 ? "s" : ""}
+- Amount Due: ${amountFormatted}
+- Due Date: ${dueDateFormatted}
 
 Please ensure your payment is made on or before the due date to avoid late fees.
 If you have already made this payment, please disregard this notice.
 
 Best regards,
-SubdivisSync Management
+SubdiviSync Management
+
+&copy; ${new Date().getFullYear()} SubdiviSync. All rights reserved.
           `,
           sender: {
             email: process.env.BREVO_SENDER_EMAIL!,

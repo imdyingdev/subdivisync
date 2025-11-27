@@ -161,7 +161,7 @@ Thank you for using SubdiviSync.
 
   await sendEmail({
     to: [{ email: userEmail, name: userName }],
-    subject: `Payment Receipt - ${formatCurrency(amount)}`,
+    subject: `Your SubdiviSync Payment Receipt #${receiptId.slice(-8)}`,
     htmlContent,
     textContent,
     sender: {
