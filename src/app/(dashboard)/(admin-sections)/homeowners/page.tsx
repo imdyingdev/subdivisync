@@ -21,7 +21,8 @@ import {
   PasswordInput,
   ScrollArea,
 } from "@mantine/core";
-import { IconEdit, IconUsers, IconSearch, IconEye } from "@tabler/icons-react";
+import { IconEdit, IconUsers, IconSearch, IconEye, IconAlertCircle, IconCheck, IconX } from "@tabler/icons-react";
+import { Alert } from "@mantine/core";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-hot-toast";
 
@@ -105,6 +106,7 @@ const TenantsSection = () => {
 
   const [autoGeneratePassword, setAutoGeneratePassword] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     if (!dataFetched) {
@@ -156,6 +158,9 @@ const TenantsSection = () => {
         phoneNumber: user.phoneNumber || "",
         property: user.property,
       }));
+
+      // Sort by created_at descending (newest first) - Fix 7B
+      mappedTenants.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       setTenants(mappedTenants);
     } catch (error) {
@@ -334,11 +339,8 @@ const TenantsSection = () => {
         }
       }
 
-      // Phone number validation - must be exactly 11 digits for PH
-      if (!editForm.phoneNumber.trim()) {
-        errors.phoneNumber = "Phone number is required";
-        isValid = false;
-      } else {
+      // Phone number validation - optional but must be valid format if provided
+      if (editForm.phoneNumber.trim()) {
         const phoneRegex = /^(09|\+639)\d{9}$/;
         if (!phoneRegex.test(editForm.phoneNumber.trim())) {
           errors.phoneNumber =
@@ -904,6 +906,64 @@ const TenantsSection = () => {
                     required
                     error={formErrors.password}
                   />
+                  
+                  {/* Password Requirements Display - Fix 11 */}
+                  <Box p="sm" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef' }}>
+                    <Text size="xs" fw={600} mb="xs">Password requirements:</Text>
+                    <Stack gap={4}>
+                      <Group gap="xs">
+                        {editForm.password.length >= 8 ? (
+                          <IconCheck size={14} color="green" />
+                        ) : (
+                          <IconX size={14} color="gray" />
+                        )}
+                        <Text size="xs" c={editForm.password.length >= 8 ? "green" : "dimmed"}>
+                          Use at least 8–12 characters
+                        </Text>
+                      </Group>
+                      <Group gap="xs">
+                        {/[A-Z]/.test(editForm.password) ? (
+                          <IconCheck size={14} color="green" />
+                        ) : (
+                          <IconX size={14} color="gray" />
+                        )}
+                        <Text size="xs" c={/[A-Z]/.test(editForm.password) ? "green" : "dimmed"}>
+                          Include at least one Uppercase Letter (A–Z)
+                        </Text>
+                      </Group>
+                      <Group gap="xs">
+                        {/[a-z]/.test(editForm.password) ? (
+                          <IconCheck size={14} color="green" />
+                        ) : (
+                          <IconX size={14} color="gray" />
+                        )}
+                        <Text size="xs" c={/[a-z]/.test(editForm.password) ? "green" : "dimmed"}>
+                          Include at least one Lowercase Letter (a–z)
+                        </Text>
+                      </Group>
+                      <Group gap="xs">
+                        {/[0-9]/.test(editForm.password) ? (
+                          <IconCheck size={14} color="green" />
+                        ) : (
+                          <IconX size={14} color="gray" />
+                        )}
+                        <Text size="xs" c={/[0-9]/.test(editForm.password) ? "green" : "dimmed"}>
+                          Include at least one Number (0–9)
+                        </Text>
+                      </Group>
+                      <Group gap="xs">
+                        {/[!@#$%^&*(),.?":{}|<>]/.test(editForm.password) ? (
+                          <IconCheck size={14} color="green" />
+                        ) : (
+                          <IconX size={14} color="gray" />
+                        )}
+                        <Text size="xs" c={/[!@#$%^&*(),.?":{}|<>]/.test(editForm.password) ? "green" : "dimmed"}>
+                          Include at least one Special Character (! @ # $ % ^ &amp; *)
+                        </Text>
+                      </Group>
+                    </Stack>
+                  </Box>
+                  
                   <PasswordInput
                     label="Confirm Password"
                     value={editForm.confirmPassword}
@@ -944,7 +1004,11 @@ const TenantsSection = () => {
               Cancel
             </Button>
             <Button
-              onClick={editingTenant ? handleUpdateTenant : handleCreateTenant}
+              onClick={editingTenant ? handleUpdateTenant : () => {
+                if (validateForm()) {
+                  setShowConfirmModal(true);
+                }
+              }}
             >
               {editingTenant ? "Update Homeowner" : "Create Homeowner"}
             </Button>
@@ -1106,6 +1170,66 @@ const TenantsSection = () => {
             </Group>
           </Stack>
         )}
+      </Modal>
+
+      {/* Confirmation Modal - Fix 7A */}
+      <Modal
+        opened={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        title="Confirm Create Homeowner"
+        centered
+        size="sm"
+      >
+        <Stack>
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            color="blue"
+            variant="light"
+          >
+            <Text size="sm">
+              Are you sure you want to create this homeowner account?
+            </Text>
+          </Alert>
+          
+          <Box p="md" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+            <Stack gap="xs">
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">Name:</Text>
+                <Text size="sm" fw={500}>
+                  {`${editForm.first_name} ${editForm.middle_name ? editForm.middle_name + ' ' : ''}${editForm.last_name}`.trim()}
+                </Text>
+              </Group>
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">Email:</Text>
+                <Text size="sm" fw={500}>{editForm.email}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">Gender:</Text>
+                <Text size="sm" fw={500}>
+                  {editForm.gender ? editForm.gender.charAt(0).toUpperCase() + editForm.gender.slice(1) : 'N/A'}
+                </Text>
+              </Group>
+            </Stack>
+          </Box>
+
+          <Group justify="flex-end" mt="md">
+            <Button
+              variant="default"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="blue"
+              onClick={() => {
+                setShowConfirmModal(false);
+                handleCreateTenant();
+              }}
+            >
+              Confirm & Create
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </Container>
   );

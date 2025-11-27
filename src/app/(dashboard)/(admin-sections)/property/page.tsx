@@ -928,7 +928,7 @@ export default function PropertyManagement() {
                   <Table.Th>Property</Table.Th>
                   <Table.Th>Block/Street</Table.Th>
                   <Table.Th>Type</Table.Th>
-                  <Table.Th>Size</Table.Th>
+                  <Table.Th>Landsize</Table.Th>
                   <Table.Th>Price</Table.Th>
                   <Table.Th>Status</Table.Th>
                   <Table.Th>Actions</Table.Th>
@@ -969,7 +969,7 @@ export default function PropertyManagement() {
                         </Badge>
                       </Table.Td>
                       <Table.Td>
-                        <Text fw={500}>{property.size}</Text>
+                        <Text fw={500}>{property.size} SQM</Text>
                       </Table.Td>
                       <Table.Td>
                         <Text fw={700} c="green.6">
@@ -1075,12 +1075,14 @@ export default function PropertyManagement() {
               leftSection={<IconMapPin size={16} />}
             />
             <TextInput
-              label="Size *"
-              placeholder="e.g., 300 sqm"
+              label="Landsize/SQM *"
+              placeholder="e.g., 300"
               value={formData.size}
-              onChange={(e) =>
-                setFormData({ ...formData, size: e.target.value })
-              }
+              onChange={(e) => {
+                // Only allow numbers
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                setFormData({ ...formData, size: value });
+              }}
               required
             />
             <TextInput
@@ -1143,84 +1145,7 @@ export default function PropertyManagement() {
                 setFormData({ ...formData, description: e.target.value })
               }
             />
-            <Select
-              label="Features"
-              placeholder="Select features"
-              onChange={(value) => value && handleFeaturesChange(value)}
-              data={[
-                {
-                  group: "Structural & Interior Features",
-                  items: [
-                    {
-                      value: "tiled-flooring-1st",
-                      label: "Tiled Flooring (1st Floor)",
-                    },
-                    {
-                      value: "tiled-flooring-2nd",
-                      label: "Tiled Flooring (2nd Floor)",
-                    },
-                    {
-                      value: "painted-interior",
-                      label: "Painted Interior Walls",
-                    },
-                    {
-                      value: "painted-exterior",
-                      label: "Painted Exterior Walls",
-                    },
-                    {
-                      value: "ceiling-2nd",
-                      label: "Ceiling Installed (2nd Floor)",
-                    },
-                    { value: "main-steel-door", label: "Main Steel Door" },
-                    { value: "standard-windows", label: "Standard Windows" },
-                  ],
-                },
-                {
-                  group: "Toilet & Bath Features",
-                  items: [
-                    {
-                      value: "complete-toilet",
-                      label: "Complete Toilet Fixtures",
-                    },
-                    { value: "tiled-bathroom", label: "Tiled Bathroom" },
-                    { value: "shower-faucet", label: "Shower with Faucet" },
-                    { value: "installed-sink", label: "Installed Sink" },
-                  ],
-                },
-                {
-                  group: "Kitchen Features",
-                  items: [
-                    { value: "kitchen-counter", label: "Kitchen Counter" },
-                    { value: "kitchen-sink", label: "Kitchen Sink" },
-                  ],
-                },
-                {
-                  group: "Outdoor & Lot Features",
-                  items: [
-                    { value: "parking-space", label: "With Parking Space" },
-                    { value: "corner-lot", label: "Corner Lot" },
-                    { value: "end-unit", label: "End Unit" },
-                  ],
-                },
-                {
-                  group: "Utility Provisions",
-                  items: [
-                    { value: "electricity-ready", label: "Electricity Ready" },
-                    { value: "water-line-ready", label: "Water Line Ready" },
-                  ],
-                },
-              ]}
-            />
-            <Group gap="md">
-              {formData.features?.map((feature) => (
-                <Badge key={feature} variant="light">
-                  {feature
-                    .replace("-", " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </Badge>
-              ))}
-            </Group>
-            <NumberInput
+                        <NumberInput
               label="Bedrooms"
               placeholder="e.g., 3"
               value={formData.bedrooms || 0}
@@ -1302,7 +1227,7 @@ export default function PropertyManagement() {
                     </Group>
                     <Group gap="xs">
                       <IconSquareRounded size={16} />
-                      <Text c="dimmed">{selectedProperty.size}</Text>
+                      <Text c="dimmed">{selectedProperty.size} SQM</Text>
                     </Group>
                   </Stack>
                   <Group gap="md" mt="md">
@@ -1433,12 +1358,14 @@ export default function PropertyManagement() {
               leftSection={<IconMapPin size={16} />}
             />
             <TextInput
-              label="Size *"
-              placeholder="e.g., 300 sqm"
+              label="Landsize/SQM *"
+              placeholder="e.g., 300"
               value={editFormData.size}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, size: e.target.value })
-              }
+              onChange={(e) => {
+                // Only allow numbers
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                setEditFormData({ ...editFormData, size: value });
+              }}
               required
             />
             <TextInput
@@ -1554,83 +1481,6 @@ export default function PropertyManagement() {
                 })
               }
             />
-            <Select
-              label="Features"
-              placeholder="Select features"
-              onChange={(value) => value && handleFeaturesChange(value, true)}
-              data={[
-                {
-                  group: "Structural & Interior Features",
-                  items: [
-                    {
-                      value: "tiled-flooring-1st",
-                      label: "Tiled Flooring (1st Floor)",
-                    },
-                    {
-                      value: "tiled-flooring-2nd",
-                      label: "Tiled Flooring (2nd Floor)",
-                    },
-                    {
-                      value: "painted-interior",
-                      label: "Painted Interior Walls",
-                    },
-                    {
-                      value: "painted-exterior",
-                      label: "Painted Exterior Walls",
-                    },
-                    {
-                      value: "ceiling-2nd",
-                      label: "Ceiling Installed (2nd Floor)",
-                    },
-                    { value: "main-steel-door", label: "Main Steel Door" },
-                    { value: "standard-windows", label: "Standard Windows" },
-                  ],
-                },
-                {
-                  group: "Toilet & Bath Features",
-                  items: [
-                    {
-                      value: "complete-toilet",
-                      label: "Complete Toilet Fixtures",
-                    },
-                    { value: "tiled-bathroom", label: "Tiled Bathroom" },
-                    { value: "shower-faucet", label: "Shower with Faucet" },
-                    { value: "installed-sink", label: "Installed Sink" },
-                  ],
-                },
-                {
-                  group: "Kitchen Features",
-                  items: [
-                    { value: "kitchen-counter", label: "Kitchen Counter" },
-                    { value: "kitchen-sink", label: "Kitchen Sink" },
-                  ],
-                },
-                {
-                  group: "Outdoor & Lot Features",
-                  items: [
-                    { value: "parking-space", label: "With Parking Space" },
-                    { value: "corner-lot", label: "Corner Lot" },
-                    { value: "end-unit", label: "End Unit" },
-                  ],
-                },
-                {
-                  group: "Utility Provisions",
-                  items: [
-                    { value: "electricity-ready", label: "Electricity Ready" },
-                    { value: "water-line-ready", label: "Water Line Ready" },
-                  ],
-                },
-              ]}
-            />
-            <Group gap="md">
-              {editFormData.features?.map((feature) => (
-                <Badge key={feature} variant="light">
-                  {feature
-                    .replace("-", " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </Badge>
-              ))}
-            </Group>
             <NumberInput
               label="Bedrooms"
               placeholder="e.g., 3"

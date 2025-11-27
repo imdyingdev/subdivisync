@@ -390,6 +390,8 @@ const PropertyListingPage = () => {
                 boxShadow: getDefaultShadow(),
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
@@ -415,9 +417,9 @@ const PropertyListingPage = () => {
                 )}
               </AspectRatio>
 
-              <Stack gap="md" mt="md">
-                <Group justify="space-between" align="flex-start">
-                  <Title order={3} size="h3" fw={600} c={primaryTextColor}>
+              <Stack gap="xs" mt="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Group justify="space-between" align="flex-start" gap="xs">
+                  <Title order={3} size="h3" fw={600} c={primaryTextColor} style={{ flex: 1 }}>
                     {property.title}
                   </Title>
                   <Badge
@@ -451,7 +453,7 @@ const PropertyListingPage = () => {
                   <Group gap="xs">
                     <IconSquare size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
                     <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
-                      {property.size}
+                      {property.size} SQM
                     </Text>
                   </Group>
                   {(property.bedrooms ?? 0) > 0 && (
@@ -508,6 +510,7 @@ const PropertyListingPage = () => {
                   disabled={property.status !== "CREATED"}
                   fullWidth
                   color="blue"
+                  mt="auto"
                 >
                   {property.status === "CREATED"
                     ? "View Details & Inquire"
@@ -586,7 +589,7 @@ const PropertyListingPage = () => {
                 <Group gap="xs">
                   <IconSquare size={18} color="gray" />
                   <Text size="md" c="dimmed">
-                    {selectedProperty.size}
+                    {selectedProperty.size} SQM
                   </Text>
                 </Group>
                 {(selectedProperty.bedrooms ?? 0) > 0 && (
