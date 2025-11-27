@@ -17,6 +17,7 @@ import {
   Tooltip,
   Modal,
   Button,
+  ScrollArea,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
@@ -389,9 +390,10 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
         bg={colorScheme === "dark" ? "dark.8" : "white"}
         withBorder
         style={{ 
-          height: "100vh",
+          height: "100dvh",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <AppShell.Section>
@@ -448,7 +450,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
 
         <Divider mb="md" />
 
-        <AppShell.Section grow>
+        <AppShell.Section grow component={ScrollArea} type="auto" scrollbarSize={6}>
           <Stack gap="xs">
             {navItems.map((item) => (
               <Tooltip
@@ -543,7 +545,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           </Stack>
         </AppShell.Section>
 
-        <Divider my="md" style={{ marginTop: 'auto' }} />
+        <Divider my="md" />
 
         <AppShell.Section>
           <Group wrap="nowrap" gap="xs">
