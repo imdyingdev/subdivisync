@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { client } from "@/database/mongodb";
+import { ObjectId } from "mongodb";
 
 export async function DELETE(
   request: NextRequest,
@@ -33,7 +34,11 @@ export async function DELETE(
     const db = client.db("subdivisync");
 
     // Check if the user exists and is a tenant/homeowner
-    const user = await db.collection("user").findOne({ id: userId });
+    // Try both id field and _id (ObjectId)
+    let user = await db.collection("user").findOne({ id: userId });
+    if (!user && ObjectId.isValid(userId)) {
+      user = await db.collection("user").findOne({ _id: new ObjectId(userId) });
+    }
     
     if (!user) {
       return NextResponse.json(
@@ -62,15 +67,24 @@ export async function DELETE(
       );
     }
 
+    // Get the actual user ID (could be from id field or _id)
+    const actualUserId = user.id || userId;
+    
     // Delete associated data
-    // 1. Delete user security records
-    await db.collection("user_security").deleteMany({ userId: userId });
+    // 1. Delete user security records (try both userId formats)
+    await db.collection("user_security").deleteMany({ 
+      $or: [{ userId: actualUserId }, { userId: userId }] 
+    });
     
     // 2. Delete sessions
-    await db.collection("session").deleteMany({ userId: userId });
+    await db.collection("session").deleteMany({ 
+      $or: [{ userId: actualUserId }, { userId: userId }] 
+    });
     
     // 3. Delete accounts (OAuth links)
-    await db.collection("account").deleteMany({ userId: userId });
+    await db.collection("account").deleteMany({ 
+      $or: [{ userId: actualUserId }, { userId: userId }] 
+    });
     
     // 4. Remove user's inquiries from properties
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,10 +94,16 @@ export async function DELETE(
     );
     
     // 5. Delete service requests
-    await db.collection("service_requests").deleteMany({ user_id: userId });
+    await db.collection("service_requests").deleteMany({ 
+      $or: [{ user_id: actualUserId }, { user_id: userId }, { user_email: user.email }] 
+    });
     
-    // 6. Finally delete the user
-    await db.collection("user").deleteOne({ id: userId });
+    // 6. Finally delete the user (try both id formats)
+    if (user._id) {
+      await db.collection("user").deleteOne({ _id: user._id });
+    } else {
+      await db.collection("user").deleteOne({ id: userId });
+    }
 
     return NextResponse.json({
       success: true,

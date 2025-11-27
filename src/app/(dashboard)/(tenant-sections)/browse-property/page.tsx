@@ -627,7 +627,7 @@ const PropertyListingPage = () => {
                   <Title order={4} fw={600} c={primaryTextColor}>
                     Description
                   </Title>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>
                     {selectedProperty.description}
                   </Text>
                 </Stack>
