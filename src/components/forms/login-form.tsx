@@ -358,12 +358,23 @@ export function LoginForm() {
             This account has been locked
           </Text>
           <Text size="xs" c="dark.7" className="mb-2">
-            Your account has been locked for security reasons. Please contact admin 
-            or customer service to regain access.
+            Your account has been locked for security reasons. An email has been sent 
+            to your registered email address with instructions to request an unlock.
           </Text>
-          <Text size="xs" c="red.7" fw={600}>
+          <Text size="xs" c="red.7" fw={600} className="mb-2">
             Failed attempts: {failedLoginCount}/3
           </Text>
+          <Link
+            href={`/unlock-request?email=${encodeURIComponent(formData.email)}`}
+            style={{
+              color: '#2563eb',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              textDecoration: 'underline',
+            }}
+          >
+            Request Account Unlock →
+          </Link>
         </Alert>
       )}
 

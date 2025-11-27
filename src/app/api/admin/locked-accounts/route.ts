@@ -105,6 +105,7 @@ export async function GET(request: NextRequest) {
         lockedBy: account.lockedBy,
         lockedReason: account.lockedReason,
         lastLoginAttempt: account.lastLoginAttempt,
+        unlockRequest: account.unlockRequest || null,
         createdAt: account.createdAt,
         updatedAt: account.updatedAt,
       };

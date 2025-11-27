@@ -1,6 +1,14 @@
 // src/database/schemas/user-security.ts
 import mongoose, { Document, Model } from "mongoose";
 
+export interface IUnlockRequest {
+  email: string;
+  reason: string;
+  submittedAt: Date;
+  status: 'pending' | 'approved' | 'rejected' | 'needs_more_info';
+  adminNotes?: string;
+}
+
 export interface IUserSecurity {
   userId: string; // Reference to the Better-Auth user ID
   failedLoginCount: number;
@@ -14,6 +22,8 @@ export interface IUserSecurity {
   lastLoginAttempt?: Date;
   lastSuccessfulLogin?: Date;
   ipAddress?: string; // Last IP that attempted login
+  lockEmailSent?: boolean; // Whether the lock notification email was sent
+  unlockRequest?: IUnlockRequest; // Homeowner's unlock request
   createdAt: Date;
   updatedAt: Date;
 }
@@ -79,6 +89,21 @@ const UserSecuritySchema = new mongoose.Schema<IUserSecurityDocument>(
         },
         message: "Invalid IP address format"
       }
+    },
+    lockEmailSent: {
+      type: Boolean,
+      default: false
+    },
+    unlockRequest: {
+      email: { type: String },
+      reason: { type: String, maxLength: 1000 },
+      submittedAt: { type: Date },
+      status: { 
+        type: String, 
+        enum: ['pending', 'approved', 'rejected', 'needs_more_info'],
+        default: 'pending'
+      },
+      adminNotes: { type: String, maxLength: 500 }
     },
   },
   {

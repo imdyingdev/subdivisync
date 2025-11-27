@@ -50,7 +50,7 @@ export function ResetPasswordForm() {
     if (pwd.match(/[a-z]/)) strength += 20;
     if (pwd.match(/[A-Z]/)) strength += 20;
     if (pwd.match(/[0-9]/)) strength += 20;
-    if (pwd.match(/[!@#$%^&]/)) strength += 20;
+    if (pwd.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/)) strength += 20;
     return Math.min(strength, 100);
   };
 
@@ -80,8 +80,8 @@ export function ResetPasswordForm() {
     if (!/(?=.*[0-9])/.test(pwd)) {
       return "Password must contain at least one number";
     }
-    if (!/(?=.*[!@#$%^&])/.test(pwd)) {
-      return "Password must contain at least one special character (! @ # $ % ^ & )";
+    if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`])/.test(pwd)) {
+      return "Password must contain at least one special character";
     }
     return null;
   };
@@ -369,7 +369,7 @@ export function ResetPasswordForm() {
               </li>
               <li
                 style={{
-                  color: /[!@#$%^&]/.test(password)
+                  color: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)
                     ? theme.colors.green[6]
                     : subTextColor,
                 }}

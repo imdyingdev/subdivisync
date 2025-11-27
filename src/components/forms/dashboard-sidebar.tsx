@@ -88,6 +88,7 @@ interface DashboardSidebarProps {
 interface NotificationCounts {
   serviceRequests: number;
   applications: number;
+  lockedAccounts: number; // For admin's locked accounts count
   // Add tenant-specific counts
   myServiceRequests: number; // For tenant's service requests with updates
   myApplications: number; // For tenant's applications with status changes
@@ -99,6 +100,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
   const [notifications, setNotifications] = useState<NotificationCounts>({
     serviceRequests: 0,
     applications: 0,
+    lockedAccounts: 0,
     myServiceRequests: 0,
     myApplications: 0,
   });
@@ -147,9 +149,21 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
           });
         }
 
+        // Fetch locked accounts count
+        let lockedAccountsCount = 0;
+        try {
+          const lockedResponse = await axios.get('/api/admin/locked-accounts?limit=1');
+          if (lockedResponse.data.success) {
+            lockedAccountsCount = lockedResponse.data.data?.pagination?.totalCount || 0;
+          }
+        } catch (err) {
+          console.warn('Could not fetch locked accounts count:', err);
+        }
+
         setNotifications({
           serviceRequests: pendingServices,
           applications: pendingApplications,
+          lockedAccounts: lockedAccountsCount,
           myServiceRequests: 0,
           myApplications: 0,
         });
@@ -183,6 +197,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
         setNotifications({
           serviceRequests: 0,
           applications: 0,
+          lockedAccounts: 0,
           myServiceRequests: pendingServiceRequests,
           myApplications: pendingApplications,
         });
@@ -254,7 +269,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
       label: "Account Security",
       href: "/account-security",
       description: "Locked Accounts",
-      notificationCount: 0,
+      notificationCount: notifications.lockedAccounts,
     },
     {
       icon: IconSpeakerphone,
