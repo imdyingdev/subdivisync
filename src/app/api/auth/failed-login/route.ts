@@ -13,8 +13,8 @@ const FailedLoginSchema = z.object({
   email: z.string().email(),
 });
 
-// Helper function to check if a user exists by email
-async function checkIfUserExists(email: string): Promise<string | null> {
+// Helper function to check if a user exists by email and get their info
+async function checkIfUserExists(email: string): Promise<{ userId: string; role?: string } | null> {
   try {
     // Use the database directly to find the user by email
     const collection = db.collection("user");
@@ -25,8 +25,8 @@ async function checkIfUserExists(email: string): Promise<string | null> {
       const userId = user.id || user._id?.toString();
       
       if (userId) {
-        console.log(`Found user ID for email ${email}: ${userId}`);
-        return userId;
+        console.log(`Found user ID for email ${email}: ${userId}, role: ${user.role}`);
+        return { userId, role: user.role };
       }
     }
     
@@ -47,12 +47,13 @@ export async function POST(request: NextRequest) {
 
     // Use userId if available, otherwise check if email belongs to existing user
     let identifier = userId;
+    let userRole: string | undefined;
     
     if (!identifier && email) {
       // Check if user exists before tracking failed attempts
-      const existingUserId = await checkIfUserExists(email);
+      const existingUser = await checkIfUserExists(email);
       
-      if (existingUserId === null) {
+      if (existingUser === null) {
         // User doesn't exist, don't track failed attempt
         return NextResponse.json(
           {
@@ -66,13 +67,29 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      identifier = existingUserId;
+      identifier = existingUser.userId;
+      userRole = existingUser.role;
     }
     
     if (!identifier) {
       return NextResponse.json(
         { success: false, message: "User identification failed" },
         { status: 400 }
+      );
+    }
+
+    // Admin accounts are exempt from lockout
+    if (userRole === "admin") {
+      console.log(`Admin account ${email} - skipping lockout tracking`);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid credentials.",
+          accountLocked: false,
+          failedLoginCount: 0,
+          attemptsRemaining: null,
+        },
+        { status: 401 }
       );
     }
     
@@ -171,8 +188,8 @@ export async function GET(request: NextRequest) {
 
     // If email is provided, look up the user ID
     if (email && !userId) {
-      const existingUserId = await checkIfUserExists(email);
-      targetUserId = existingUserId || null;
+      const existingUser = await checkIfUserExists(email);
+      targetUserId = existingUser?.userId || null;
     }
 
     let userSecurity = null;
