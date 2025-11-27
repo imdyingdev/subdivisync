@@ -354,7 +354,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
       header={{ height: { base: 60, lg: 0 } }}
       padding="md"
     >
-      <AppShell.Header p="md" hiddenFrom="sm">
+      <AppShell.Header p="md" hiddenFrom="lg">
         <Group justify="space-between" align="center">
           <Group gap="sm">
             <Burger
@@ -363,6 +363,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
               size="sm"
               color={colorScheme === "dark" ? "white" : "dark"}
             />
+            <Text size="lg" fw={700} c="blue" visibleFrom="xs">
+              SubdiviSync
+            </Text>
           </Group>
           <Tooltip label="Toggle color scheme">
             <ActionIcon
@@ -404,7 +407,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                 </Badge>
               </div>
             )}
-            <Group gap="xs" visibleFrom="sm">
+            <Group gap="xs" visibleFrom="lg">
               <Tooltip
                 label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 position="right"
@@ -460,6 +463,7 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                   href={item.href}
                   active={pathname === item.href}
                   label={collapsed ? "" : item.label}
+                  onClick={() => setOpened(false)}
                   leftSection={<item.icon size="1.2rem" stroke={1.5} />}
                   rightSection={
                     !collapsed && (
@@ -539,13 +543,22 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
 
         <AppShell.Section>
           {collapsed ? (
-            <Tooltip label={`${userName} - ${userTitle}`} position="right">
-              <Group justify="center">
+            <Stack gap="xs" align="center">
+              <Tooltip label={`${userName} - ${userTitle}`} position="right">
                 <Avatar src={userImage} radius="xl" size="sm">
                   {!userImage && userName.charAt(0).toUpperCase()}
                 </Avatar>
-              </Group>
-            </Tooltip>
+              </Tooltip>
+              <Tooltip label="Logout" position="right">
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  onClick={() => setShowLogoutModal(true)}
+                >
+                  <IconLogout size="1rem" />
+                </ActionIcon>
+              </Tooltip>
+            </Stack>
           ) : (
             <Group wrap="nowrap" gap="xs">
               <Avatar src={userImage} radius="xl" size="sm">
