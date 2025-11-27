@@ -418,17 +418,17 @@ const PropertyListingPage = () => {
               </AspectRatio>
 
               <Stack gap="xs" mt="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Group justify="space-between" align="flex-start" gap="xs">
-                  <Title order={3} size="h3" fw={600} c={primaryTextColor} style={{ flex: 1 }}>
-                    {property.title}
-                  </Title>
-                  <Badge
-                    color={getStatusColor(property.status)}
-                    variant="light"
-                  >
-                    {getStatusMessage(property.status)}
-                  </Badge>
-                </Group>
+                <Badge
+                  color={getStatusColor(property.status)}
+                  variant="light"
+                  size="xs"
+                  style={{ alignSelf: 'flex-end', marginBottom: 4 }}
+                >
+                  {getStatusMessage(property.status)}
+                </Badge>
+                <Title order={4} fw={600} c={primaryTextColor}>
+                  {property.title}
+                </Title>
 
                 <Group gap="xs">
                   <IconMapPin size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
@@ -437,48 +437,49 @@ const PropertyListingPage = () => {
                   </Text>
                 </Group>
 
-                <Text fw={700} size="xl" c="green">
-                  ₱{property.price.toLocaleString("en-PH")}
-                </Text>
+                <Group gap={4}>
+                  <Text size="xs" c="dimmed">House Price:</Text>
+                  <Text fw={700} size="md" c="green">
+                    ₱{property.price.toLocaleString("en-PH")}
+                  </Text>
+                </Group>
 
                 <SimpleGrid cols={2}>
-                  <Group gap="xs">
-                    <IconBuilding size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                    <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                  <Group gap={4} wrap="nowrap">
+                    <IconBuilding size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                    <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                       {property.type
                         .replace("-", " ")
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </Text>
                   </Group>
-                  <Group gap="xs">
-                    <IconSquare size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                    <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                  <Group gap={4} wrap="nowrap">
+                    <IconSquare size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                    <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
                       {property.size} SQM
                     </Text>
                   </Group>
                   {(property.bedrooms ?? 0) > 0 && (
-                    <Group gap="xs">
-                      <IconBed size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
-                        {property.bedrooms} Bedroom
-                        {property.bedrooms !== 1 ? "s" : ""}
+                    <Group gap={4} wrap="nowrap">
+                      <IconBed size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                        {property.bedrooms} Bed{property.bedrooms !== 1 ? "s" : ""}
                       </Text>
                     </Group>
                   )}
                   {(property.bathrooms ?? 0) > 0 && (
-                    <Group gap="xs">
-                      <IconBath size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
-                        {property.bathrooms} Bathroom
-                        {property.bathrooms !== 1 ? "s" : ""}
+                    <Group gap={4} wrap="nowrap">
+                      <IconBath size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                        {property.bathrooms} Bath{property.bathrooms !== 1 ? "s" : ""}
                       </Text>
                     </Group>
                   )}
                   {(property.sqft ?? 0) > 0 && (
-                    <Group gap="xs">
-                      <IconSquare size={16} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
-                      <Text size="sm" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
-                        {property.sqft} sq ft
+                    <Group gap={4} wrap="nowrap">
+                      <IconSquare size={14} color={colorScheme === "dark" ? "#9ca3af" : "gray"} />
+                      <Text size="xs" c={colorScheme === "dark" ? "gray.4" : "dimmed"}>
+                        {property.sqft} sqft
                       </Text>
                     </Group>
                   )}
