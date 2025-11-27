@@ -481,9 +481,9 @@ export function DashboardSidebar({ children, session }: DashboardSidebarProps) {
                 openDelay={300}
               >
                 <NavLink
-                  component={(item as any).isLogout ? "button" : Link}
-                  href={(item as any).isLogout ? undefined : item.href}
-                  active={pathname === item.href}
+                  component={!(item as any).isLogout ? Link : undefined}
+                  href={(item as any).isLogout ? "#" : item.href}
+                  active={pathname === item.href && !(item as any).isLogout}
                   label={collapsed ? "" : item.label}
                   onClick={(e: any) => {
                     if ((item as any).isLogout) {
